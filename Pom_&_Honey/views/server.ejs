@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang=”en”>
+	<head>
+        <link rel="stylesheet" type="text/css" href="/css/main.css"></link>
+		<title>Server | Manager</title>
+
+		<style>
+			.center-container {
+				margin: auto;
+				width: 80%;
+
+			}
+			.btn-vertical button {
+				display: block;  /* vertical buttons */
+                width:200px;
+			}
+			.main-grid-items {
+				display: grid;
+				grid-template-columns: repeat(5, 100px);
+                grid-template-rows: repeat(5, 100px);
+                margin:0px 50px;
+                height:500px;
+                grid-gap:0px;
+			}
+            #contentWrapper{
+                width:100%;
+            }
+		</style>
+
+	</head>
+	<body>
+		<%- include("logo.ejs") %>
+		<h2>Server View</h2>
+        <div id="google_translate_id"></div>
+        <table id="contentWrapper">
+            <tr>
+                <td align="right">
+                    <div class="btn-vertical">
+                        <% for(let productDef of productDefs) { %>
+                        <button onclick="loadNewProduct(<%=productDef.id%>)" id="productDef_button_<%=productDef.id%>"><%=productDef.name%></button>
+                        <% } %>
+                    </div>
+                </td>
+
+                <td align="center" style="width:500px;">
+                    <div class="main-grid-items" id="all-items">
+                        <% for(let item of items){ %>
+                            <% var color = "#444444" %>
+                            <% for (let category of categories) { %>
+                                <% if (category.id == item.categoryid) { %>
+                                    <% color = category.color %>
+                                <% } %>
+                            <% } %>
+                            <button style="background:<%=color%>;display:none;border:none;" selectable=true itemId=<%=item.id%> style="display:none;" id="item_button_<%=item.id%>"><%=item.name%></button>
+                        <% } %>
+                        <button id="remove_product_button" class="neutral" style="display:none" onclick="removeSelectedProduct()">Remove Product</button>
+                    </div>
+                </td>
+
+                <td align="left" style="vertical-align:bottom;">
+                    <div class="btn-vertical">
+                    <p>
+                        Add discount: <input type="number" id="discount"/>
+                    </p>
+                    <button onclick="addDiscount()">Discount</button>
+                </div>
+            </td>
+
+                <td align="left" style="vertical-align:bottom;">
+                    <div class="btn-vertical">
+                        <div id="receipt"></div>
+                        <p>
+                            Subtotal: $<span id="subtotal">0.00</span><br>
+                            Discount: <span id="curDiscount">0</span>%<br>
+                            Total: $<span id="total">0.00</span><br>
+                        </p>
+                    <button onclick="finalizeOrder()">Finalize Order</button>
+                    </div>
+                </td>
+
+            </tr>
+        </table>
+
+
+        <script src="/js/server.js"></script>
+        <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCW9HNP9YkGooUrAov5-VImo6XmtbEQ4W8&callback=myMap"></script>
+        <script>
+            var productDefs = <%-JSON.stringify(productDefs)%>;
+        </script>
+		<script src="/js/serverView.js"></script>
+	</body>
+</html>

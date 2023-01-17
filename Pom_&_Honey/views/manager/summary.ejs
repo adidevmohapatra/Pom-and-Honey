@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <%- include("head") %>
+    <title>Summary | Manager</title>
+</head>
+<body>
+    <%- include("header") %>
+    <div class="center-content">
+        <p>Total Sales: $<%=sales.toLocaleString()%></p>
+        <p>Sales this week: $<%=week.toLocaleString()%></p>
+                <p>Restock Report: </p>
+                <% var anyRestock = false%>
+                <% for(let r of restock) { %>
+                    <%anyRestock = true%>
+                    <tr>
+                        <td>
+                            <p>
+                                <%=r.name.toLocaleString()%> is below min quantity of <%=r.minquantity.toLocaleString()%>, with <%=r.quantity.toLocaleString()%><%=r.units%> remaining
+                            </p>
+                        </td>
+                    </tr>
+                    <% } %>
+                    <% if(anyRestock == false){%>
+                        <tr>
+                            <td>
+                                <p>
+                                    No items in need of restock
+                                </p>
+                            </td>
+                        </tr>
+                        <% } %>
+    </div>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "name": "Pom and Honey",
+  "version": "1.0.0",
+  "description": "Web-based POS system for Pom and Honey.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "doc": "jsdoc README.md public/js/*.js server/*.js --destination public/docs"
+  },
+  "dependencies": {
+    "async": "^2.6.1",
+    "cookie-parser": "^1.4.5",
+    "dotenv": "^8.6.0",
+    "ejs": "^3.1.8",
+    "express": "^4.10.2",
+    "jsdoc": "^4.0.0",
+    "express-session": "^1.17.3",
+    "google-auth-library": "^8.7.0",
+    "node-fetch": "^2.6.1",
+    "nodemon": "^2.0.20",
+    "passport-google-oauth20": "^2.0.0",
+    "pg": "^8.8.0"
+  },
+  "engines": {
+    "node": ">=16.13.2"
+  }
+}

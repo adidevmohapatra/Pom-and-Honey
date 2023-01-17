@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: server/dbConnection.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: server/dbConnection.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict'
+const {Client} = require('pg');
+const async = require('async');
+
+/**
+ * Manages the connection between the server and the SQL database.
+ */
+class dbConnection{
+    #client;
+    constructor(){
+        this.#client = new Client();
+    }
+    /**
+     * Connect to the database.
+     */
+    async connect(){
+        await this.#client.connect();
+    }
+    
+    /**
+     * Send a query to the database and return the result
+     * @param {String} cmd - the command to use
+     */
+    async sendQuery(cmd){
+        return await this.#client.query(cmd);
+    }
+    
+    /**
+     * add an order to the database.
+     * @param {Object} order - an object describing an order with the following format:
+     *  order = {
+            discount: Number,
+            productList:[{
+                id:Number,
+                selectedItems:[Number]
+            }]
+        }
+     */
+    async addOrderToDatabase(order){
+        let orderId = await this.findNewId("orders");
+        console.log("New Order ID: " + orderId);
+        let subtotal = 0;
+        for (let product of order.productList) {
+            let cmd = "SELECT * FROM productdef WHERE id=" + product.id;
+            let productDef = await this.sendQuery(cmd);
+            productDef = productDef.rows[0];
+            subtotal += productDef.price;
+            // Generate the necessary product data
+            let itemList = productDef.baseitemlist.concat(product.selectedItems);
+            let selectedItemPortions = [];
+            for (let item of product.selectedItems) {
+                let i = productDef.optionalitemlist.indexOf(item);
+                if(i == -1){
+                    // Invalid optional item
+                    console.log(productDef.name + " has invalid optional item: " + item);
+                    return 400;
+                }
+                let size = productDef.optionalportionlist[i];
+                selectedItemPortions.push(size);
+            }
+            let portionList = productDef.baseportionlist.concat(selectedItemPortions);
+            console.log("New Product Info: ");
+            console.log(" - instance of: ");
+            console.log(productDef);
+            console.log(" - items: ");
+            console.log(itemList);
+            console.log(" - portions: ");
+            console.log(portionList);
+
+            // Change the item quantities in the database as needed
+            for(let i=0;i&lt;itemList.length;i++){
+                await this.sendQuery("UPDATE item SET quantity = quantity-" + portionList[i] + " WHERE id = " + itemList[i]);
+            }
+            // Add the product data to the database
+            cmd = "";
+            cmd += "'" + productDef.name + "', ";
+            cmd += (productDef.price + ", ");
+            cmd += "'{" + itemList.toString() + "}', ";
+            cmd += "'{" + portionList.toString() + "}', ";
+            cmd += "'" + this.getSQLDate() + "',";
+            cmd += orderId;
+            let full = "INSERT INTO products VALUES (" + cmd + ")";
+            console.log(full);
+            await this.sendQuery(full);
+        }
+
+       // Apply discounts and then tax.
+       let total = subtotal * (100 - order.discount)/100 * 1.0825;
+
+       let cmd = "";
+       cmd += orderId + ", ";
+       cmd += order.discount + ", ";
+       cmd += subtotal + ", ";
+       cmd += total + ", ";
+       cmd += "'" + this.getSQLDate() + "'";
+
+       let full = "INSERT INTO orders VALUES (" + cmd + ")";
+       this.sendQuery(full);
+       return 200;
+    }
+    
+    /**
+     * Returns the next available id in a table (equivalent to the maximum current id plus one)
+     * @param {String} table - the SQL table to search through
+     */
+    async findNewId(table){
+        // Returns the ID of the new product when done.
+        let id = 0;
+            let r = await this.sendQuery("SELECT MAX(id) FROM " + table);
+            id = r.rows[0].max+1;
+        return Promise.resolve(id);
+    }
+
+    /**
+     * Returns the current date in SQL format
+     * @returns {String} today's date string, useful for SQL queries
+     */
+    getSQLDate() {
+        const date = new Date();
+        let day = date.getDate();
+        let month = date.getMonth() + 1;
+        let year = date.getFullYear();
+        let dbDate = year+"-"+month+"-"+day
+        return dbDate;
+    }
+}
+
+module.exports = dbConnection;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="dbConnection.html">dbConnection</a></li><li><a href="server.html">server</a></li></ul><h3>Global</h3><ul><li><a href="global.html#changeScreen">changeScreen</a></li><li><a href="global.html#changeScreenProduct">changeScreenProduct</a></li><li><a href="global.html#finalizeOrder">finalizeOrder</a></li><li><a href="global.html#getProductDef">getProductDef</a></li><li><a href="global.html#googleTranslateElementInit">googleTranslateElementInit</a></li><li><a href="global.html#loadExistingProduct">loadExistingProduct</a></li><li><a href="global.html#loadItemsForProductDef">loadItemsForProductDef</a></li><li><a href="global.html#loadNewProduct">loadNewProduct</a></li><li><a href="global.html#myMap">myMap</a></li><li><a href="global.html#proteinAreaBtn">proteinAreaBtn</a></li><li><a href="global.html#removeProteinAreaBtn">removeProteinAreaBtn</a></li><li><a href="global.html#removeSelectedProduct">removeSelectedProduct</a></li><li><a href="global.html#resetAllButtons">resetAllButtons</a></li><li><a href="global.html#restockItem">restockItem</a></li><li><a href="global.html#updatePrice">updatePrice</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Tue Dec 06 2022 23:25:22 GMT+0000 (Coordinated Universal Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <%- include("head") %>
+    <title>Items | Manager</title>
+</head>
+<body>
+    <%- include("header") %>
+    <div class="center-content">
+        <div class="items-layout">
+
+            <div class="products-layout">
+                <h2>Products</h2>
+                <table>
+                    <% for(let product of productdef) { %>
+                    <tr>
+                        <td>
+                            <p>
+                                <%=product.name%>
+                            </p>
+                        </td>
+                        <td>
+                            <p>
+                                $<%=product.price.toLocaleString()%>
+                            </p>
+                        </td>
+                    </tr>
+                    <% } %>
+                </table>
+            </div>
+
+
+            <div class="restock-layout">
+                <h2>Items</h2>
+                <table >
+                    <% for(let item of items) { %>
+                    <tr>
+                        <td>
+                            <p>
+                                <%=item.name%>
+                            </p>
+                        </td>
+                        <td>
+                            <p>
+                                <span id="quantity_<%=item.id%>"><%=item.quantity.toLocaleString()%></span> <%=item.units%>
+                            </p>
+                        </td>
+                        <td>
+                            <label>Restock: <input id="restock_input_<%=item.id%>" type="number" min=0></label>
+                            <button onclick="restockItem(<%=item.id%>);">Submit</button>
+                        </td>
+                    </tr>
+                    <% } %>
+                </table>
+            </div>
+
+            <script src="/js/server.js"></script>
+            <script src="/js/managerView.js"></script>
+        </div>
+    </div>
+</body>
+</html>

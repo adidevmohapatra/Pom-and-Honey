@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <%- include("head") %>
+    <title>Orders | Manager</title>
+</head>
+
+<style>
+    .center-content1 {
+        margin: auto;
+        width: 50%;
+    }
+
+    .table-format p {
+        margin: auto;
+        width: 50%;
+        padding: 5px;
+    }
+
+    .page-format {
+        display: grid;
+        grid-template-columns: repeat(3, 200px);
+    }
+
+    .stack {
+		display: block;
+    }
+
+    .center-title {
+        margin: auto;
+        width: 50%;
+        padding: 10px;
+    }
+</style>
+
+<script>
+    function dateWindow() {
+        var low= document.getElementById("lowDate").value;
+        var high = document.getElementById("highDate").value;
+        window.location = 'orders?s='+low+'&e='+high;
+        return false;
+    }
+</script>
+    
+<body>
+    <%- include("header") %>
+    <h2 class="center-title">Orders</h2>
+    <div class="center-content1 page-format">
+        
+        <div class="stack">
+            <p>
+                Low date: <input type="text" id="lowDate"/>
+            </p>
+            <p>
+                High date: <input type="text" id="highDate"/>
+            </p>
+            <button onclick="return dateWindow()">Change dates</button>
+        </div>
+
+        <div class="table-format">
+            <table cellspacing="0" cellpadding="1" border="1" width="300">
+                <% for(let order of orders) { %>
+                <tr id = <%=order.id%>>
+                    <td>
+                        <p>
+                            <%=order.id%>
+                        </p>
+                    </td>
+                    <td>
+                        <p>
+                            $<%=order.total.toLocaleString()%>
+                        </p>
+                    </td>
+                    <td>
+                        <p>
+                            <%=order.date.toLocaleDateString()%>
+                        </p>
+                    </td>
+                </tr>
+                <% } %>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

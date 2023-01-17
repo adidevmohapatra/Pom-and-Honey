@@ -1,0 +1,38 @@
+upstream node{
+    # Our nodeJS server will run on port 8080.
+    least_conn;
+    server 127.0.0.1:8080;
+}
+
+server {
+    listen 80;
+    listen 443 ssl http2;
+
+    server_name pomandhoney.kfox.studio;
+    ssl_certificate /etc/letsencrypt/live/pomandhoney.kfox.studio/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/pomandhoney.kfox.studio/privkey.pem;
+
+    include snippets/ssl-params.conf;
+
+    root /home/kevin/apps/pomandhoney/public;
+    index index.html;
+
+    location / {
+        # Don't cache anything.
+        add_header Last-Modified $date_gmt;
+        add_header Cache-Control 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
+        if_modified_since off;
+        expires off;
+        etag off;
+        # Compress css, html, and javascript files
+        gzip on;
+        gzip_types text/plain text/html text/css text/javascript application/javascript application/x-javascript;
+    
+        # Try serving a file first (i.e. see if it exists) then go to the node process
+        try_files $uri @node;
+    }
+    
+    location @node {
+        proxy_pass http://node;
+    }
+}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang=”en”>
+    <head>
+        <title>Test</title>
+        <link rel="stylesheet" type="text/css" href="/css/main.css"></link>
+        <%- include("manager/head.ejs"); %>
+    </head>
+    <body>
+        <div class="center-content">
+            <%- include("logo.ejs") %>
+            <h1>Pom and Honey POS</h1>
+            <% if(user.manager) { %>
+                <a href="/manager/summary"><button>Manager View</button></a>
+            <% } %>
+            <% if(user.server) { %>
+                <a href="/server"><button>Server View</button></a>
+            <% } %>
+            <a href="/customer"><button>Customer View</button></a>
+            <br>Welcome back <%=user.name%>!
+            <a href="/logout"><button>Logout</button></a>
+            <div id="google_translate_id"></div>
+            
+            <div id="googleMap" style="width:100%;height:400px;"></div>
+
+        </div>
+
+        <script src="/js/server.js"></script>
+        
+        <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+        <script>
+            function googleTranslateElementInit() {
+                new google.translate.TranslateElement(
+                    {pageLanguage: 'en'}, 'google_translate_id'
+                )
+            }
+        </script>
+    </body>
+</html>
